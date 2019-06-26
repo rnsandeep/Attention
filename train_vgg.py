@@ -14,7 +14,6 @@ import torchvision.utils as utils
 from torchvision import datasets, models, transforms
 from networks import AttnVGG, VGG
 from loss import FocalLoss
-from data import preprocess_data_2016, preprocess_data_2017, ISIC
 from utilities import *
 import time, copy
 import sys
@@ -75,8 +74,8 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
                        outputs = model(inputs)
                     _, preds = torch.max(outputs, 1)
 #                    print(preds, labels.data)
-#                    loss = criterion(outputs, labels)
-                    loss = nn.CrossEntropyLoss()(outputs, labels)
+                    loss = criterion(outputs, labels)
+#                    loss = nn.CrossEntropyLoss()(outputs, labels)
 #                    loss = nn.CrossEntropyLoss(weight=class_weights)(outputs, labels)
 #                    loss = criterion(outputs, labels, weight=class_weights)
                     # backward + optimize only if in training phase
@@ -222,7 +221,7 @@ lr_lambda = lambda epoch : np.power(0.1, epoch//10)
 scheduler = lr_scheduler.LambdaLR(optimizer_ft, lr_lambda=lr_lambda)
 
 #print('use focal loss ...')
-criterion = ''#FocalLoss(gama=2., size_average=True, weight=None)
+criterion = FocalLoss(gama=2., size_average=True, weight=None)
 
 # move to GPU
 
